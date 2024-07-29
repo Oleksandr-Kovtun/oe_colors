@@ -5,7 +5,7 @@ const socketIo = require('socket.io');
 const osc = require('osc');
 
 const app = express();
-const port = 80;
+const port = process.env.PORT || 80;
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -14,6 +14,9 @@ const io = socketIo(server, {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware для обробки JSON в тілі запиту
+app.use(express.json());
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -30,6 +33,13 @@ io.on('connection', (socket) => {
         io.emit('changeColor', color);
     });
 
+    socket.on('oscMessage', (oscMsg) => {
+        if (oscMsg.address === "/changeColor") {
+            const color = oscMsg.args[0];
+            io.emit('changeColor', color);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
@@ -37,18 +47,37 @@ io.on('connection', (socket) => {
 
 // OSC server setup
 const udpPort = new osc.UDPPort({
-    localAddress: "0.0.0.0",
+	localAddress: "0.0.0.0",
     localPort: 57121
 });
 
 udpPort.on("message", (oscMsg) => {
-    if (oscMsg.address === "/changeColor") {
-        const color = oscMsg.args[0];
-        io.emit('changeColor', color);
-    }
+    io.emit('oscMessage', oscMsg);
 });
 
 udpPort.open();
+
+// API route to change color
+app.post('/api/changeColor', (req, res) => {
+    const color = req.body.color;
+    if (color) {
+        io.emit('changeColor', color);
+        res.status(200).send({ status: 'success', color: color });
+    } else {
+        res.status(400).send({ status: 'error', message: 'Color not specified' });
+    }
+});
+
+// API route to change color via URL
+app.get('/api/changeColor/:color', (req, res) => {
+    const color = req.params.color;
+    if (color) {
+        io.emit('changeColor', color);
+        res.status(200).send({ status: 'success', color: color });
+    } else {
+        res.status(400).send({ status: 'error', message: 'Color not specified' });
+    }
+});
 
 server.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
