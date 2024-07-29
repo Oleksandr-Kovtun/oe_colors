@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Operator Page</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const socket = io();
+
+            document.getElementById('blackButton').addEventListener('click', () => {
+                socket.emit('changeColor', 'black');
+            });
+
+            document.getElementById('whiteButton').addEventListener('click', () => {
+                socket.emit('changeColor', 'white');
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Operator Page</h1>
+    <button id="blackButton">Чорне</button>
+    <button id="whiteButton">Біле</button>
+</body>
+</html>
+
