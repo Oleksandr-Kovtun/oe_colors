@@ -30,12 +30,15 @@ io.on('connection', (socket) => {
     console.log('A user connected');
     
     socket.on('changeColor', (color) => {
+        console.log(`Color change requested: ${color}`);
         io.emit('changeColor', color);
     });
 
     socket.on('oscMessage', (oscMsg) => {
+        console.log(`OSC Message received: ${JSON.stringify(oscMsg)}`);
         if (oscMsg.address === "/changeColor") {
             const color = oscMsg.args[0];
+            console.log(`Changing color via OSC: ${color}`);
             io.emit('changeColor', color);
         }
     });
@@ -47,12 +50,21 @@ io.on('connection', (socket) => {
 
 // OSC server setup
 const udpPort = new osc.UDPPort({
-	localAddress: "0.0.0.0",
-	localPort: 57121
+    localAddress: "0.0.0.0",
+    localPort: 57121
+});
+
+udpPort.on("ready", () => {
+    console.log(`OSC server is listening on port ${udpPort.options.localPort}`);
 });
 
 udpPort.on("message", (oscMsg) => {
+    console.log(`OSC message received: ${JSON.stringify(oscMsg)}`);
     io.emit('oscMessage', oscMsg);
+});
+
+udpPort.on("error", (err) => {
+    console.error(`Error with OSC server: ${err.message}`);
 });
 
 udpPort.open();
@@ -61,6 +73,7 @@ udpPort.open();
 app.post('/api/changeColor', (req, res) => {
     const color = req.body.color;
     if (color) {
+        console.log(`API Color change requested: ${color}`);
         io.emit('changeColor', color);
         res.status(200).send({ status: 'success', color: color });
     } else {
@@ -72,6 +85,7 @@ app.post('/api/changeColor', (req, res) => {
 app.get('/api/changeColor/:color', (req, res) => {
     const color = req.params.color;
     if (color) {
+        console.log(`URL Color change requested: ${color}`);
         io.emit('changeColor', color);
         res.status(200).send({ status: 'success', color: color });
     } else {
@@ -82,4 +96,3 @@ app.get('/api/changeColor/:color', (req, res) => {
 server.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
-
