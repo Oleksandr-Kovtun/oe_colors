@@ -3,6 +3,51 @@
 <head>
     <title>Operator Page</title>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        button {
+            width: 200px;
+            height: 100px;
+            font-size: 24px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        #blackButton {
+            background-color: black;
+            color: white;
+        }
+
+        #blackButton:hover {
+            background-color: #333;
+        }
+
+        #whiteButton {
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+        }
+
+        #whiteButton:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const socket = io();
@@ -18,9 +63,10 @@
     </script>
 </head>
 <body>
-    <h1>Operator Page</h1>
-    <button id="blackButton">Чорне</button>
-    <button id="whiteButton">Біле</button>
+    <div class="button-container">
+        <button id="blackButton">Чорне</button>
+        <button id="whiteButton">Біле</button>
+    </div>
 </body>
 </html>
 
