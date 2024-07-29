@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
 // OSC server setup
 const udpPort = new osc.UDPPort({
 	localAddress: "100.20.92.101",
-    localPort: 57121
+	localPort: 57121
 });
 
 udpPort.on("message", (oscMsg) => {
