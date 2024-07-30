@@ -96,4 +96,3 @@ app.get('/api/changeColor/:color', (req, res) => {
 server.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
-
